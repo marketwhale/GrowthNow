@@ -1,17 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  Animated,
-  StatusBar,
-  Linking,
-  BackHandler,
-  Platform,
-} from 'react-native';
-import { WebView } from 'react-native-webview';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/themed-view';
 import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  BackHandler,
+  Linking,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 export default function WebViewScreen() {
   const webviewRef = useRef<WebView>(null);
@@ -49,7 +49,7 @@ export default function WebViewScreen() {
 
   const handleShouldStartLoadWithRequest = (request: any) => {
     const { url } = request;
-    if (url.startsWith('https://demo.marketwhaleit.com/')) return true;
+    if (url.startsWith('https://growthnow.marketwhaleai.com/')) return true;
 
     if (url.startsWith('tel:') || url.startsWith('mailto:') || url.startsWith('https://wa.me')) {
       Linking.openURL(url).catch(err => console.error('Failed to open link:', err));
@@ -74,7 +74,7 @@ export default function WebViewScreen() {
         if (a && a.target === '_blank') {
           e.preventDefault();
           var href = a.href;
-          if (href.startsWith('https://demo.marketwhaleit.com/')) {
+          if (href.startsWith('https://growthnow.marketwhaleai.com/')) {
             window.location.href = href;
           } else {
             window.ReactNativeWebView.postMessage(JSON.stringify({ url: href }));
@@ -110,7 +110,7 @@ export default function WebViewScreen() {
 
         <WebView
           ref={webviewRef}
-          source={{ uri: 'https://demo.marketwhaleit.com/' }}
+          source={{ uri: 'https://growthnow.marketwhaleai.com/' }}
           style={styles.webview}
           onLoadStart={onLoadStart}
           onLoadProgress={onLoadProgress}
