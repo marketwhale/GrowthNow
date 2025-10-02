@@ -1,4 +1,6 @@
 import { ThemedView } from '@/components/themed-view';
+import { Colors } from '@/constants/theme'; // Import Colors
+import { useColorScheme } from '@/hooks/use-color-scheme'; // Import useColorScheme
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -104,6 +106,9 @@ export default function WebViewScreen() {
     }
   };
 
+  const colorScheme = useColorScheme(); // Get current color scheme
+  const tintColor = Colors[colorScheme ?? 'light'].tint; // Determine tint color based on scheme
+
   return (
     <ThemedView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" animated />
@@ -116,6 +121,7 @@ export default function WebViewScreen() {
                 styles.progressBar,
                 {
                   width: animatedWidth.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+                  backgroundColor: tintColor, // Use consistent tint color
                 },
               ]}
             />
@@ -128,8 +134,9 @@ export default function WebViewScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#00FFDD"
-              colors={['#00FFDD']}
+              tintColor={tintColor} // Use consistent tint color
+              colors={[tintColor]} // Use consistent tint color
+              progressBackgroundColor="#000000" // Set background color of the refresh indicator to white
               enabled={isAtTop} // Only enable refresh control when at the top
             />
           }
@@ -164,7 +171,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   safeArea: { flex: 1, backgroundColor: '#000' },
   progressContainer: { height: 4, backgroundColor: '#222', overflow: 'hidden' },
-  progressBar: { height: '100%', backgroundColor: '#00FFDD' },
+  progressBar: { height: '100%' }, // Remove hardcoded background color
   webview: { flex: 1 },
   scrollViewContent: { flexGrow: 1 }, // Ensure ScrollView content takes full height
 });
