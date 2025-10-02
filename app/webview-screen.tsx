@@ -6,9 +6,11 @@ import {
   BackHandler,
   Linking,
   Platform,
+  RefreshControl, // Re-add RefreshControl
+  ScrollView, // Import ScrollView
   StatusBar,
   StyleSheet,
-  View,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -17,9 +19,12 @@ export default function WebViewScreen() {
   const webviewRef = useRef<WebView>(null);
   const [progress, setProgress] = useState(0);
   const [canGoBack, setCanGoBack] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true); // New state to track if WebView is at the top
   const animatedWidth = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
 
+  // Animate progress bar
   useEffect(() => {
     Animated.timing(animatedWidth, {
       toValue: progress,
@@ -28,15 +33,15 @@ export default function WebViewScreen() {
     }).start();
   }, [progress]);
 
-  // ✅ Handle Android hardware back button
+  // Handle Android back button
   useEffect(() => {
     if (Platform.OS === 'android') {
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
         if (canGoBack && webviewRef.current) {
           webviewRef.current.goBack();
-          return true; // prevent default exit
+          return true;
         } else {
-          navigation.goBack(); // leave the screen
+          navigation.goBack();
           return true;
         }
       });
@@ -46,35 +51,30 @@ export default function WebViewScreen() {
 
   const onLoadStart = () => setProgress(0);
   const onLoadProgress = (event: any) => setProgress(event.nativeEvent.progress);
+  const handleNavigationStateChange = (navState: any) => setCanGoBack(navState.canGoBack);
 
   const handleShouldStartLoadWithRequest = (request: any) => {
     const { url } = request;
-    if (url.startsWith('https://growthnow.marketwhaleai.com/')) return true;
-
+    if (url.startsWith('https://shopnow.marketwhaleai.com/')) return true;
     if (url.startsWith('tel:') || url.startsWith('mailto:') || url.startsWith('https://wa.me')) {
-      Linking.openURL(url).catch(err => console.error('Failed to open link:', err));
+      Linking.openURL(url).catch(console.error);
       return false;
     }
-
-    Linking.openURL(url).catch(err => console.error('Failed to open link:', err));
+    Linking.openURL(url).catch(console.error);
     return false;
-  };
-
-  // ✅ Track if WebView can go back
-  const handleNavigationStateChange = (navState: any) => {
-    setCanGoBack(navState.canGoBack);
   };
 
   const injectedJS = `
     (function() {
+      document.documentElement.style.overflow = 'scroll';
+      document.body.style.overflow = 'scroll';
       window.open = function(url) { window.location.href = url; return null; };
-
       document.addEventListener('click', function(e) {
         var a = e.target.closest('a');
         if (a && a.target === '_blank') {
           e.preventDefault();
           var href = a.href;
-          if (href.startsWith('https://growthnow.marketwhaleai.com/')) {
+          if (href.startsWith('https://shopnow.marketwhaleai.com/')) {
             window.location.href = href;
           } else {
             window.ReactNativeWebView.postMessage(JSON.stringify({ url: href }));
@@ -88,39 +88,73 @@ export default function WebViewScreen() {
   const onMessage = (event: any) => {
     try {
       const { url } = JSON.parse(event.nativeEvent.data);
-      if (url) Linking.openURL(url).catch(err => console.error('Failed to open link:', err));
+      if (url) Linking.openURL(url).catch(console.error);
     } catch {}
+  };
+
+  const handleScroll = (event: any) => {
+    const { contentOffset } = event.nativeEvent;
+    setIsAtTop(contentOffset.y === 0);
+  };
+
+  const onRefresh = () => {
+    if (isAtTop) {
+      setRefreshing(true);
+      webviewRef.current?.reload();
+    }
   };
 
   return (
     <ThemedView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" animated />
-
       <SafeAreaView style={styles.safeArea}>
+        {/* Progress Bar */}
         {progress < 1 && (
           <View style={styles.progressContainer}>
             <Animated.View
               style={[
                 styles.progressBar,
-                { width: animatedWidth.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }) },
+                {
+                  width: animatedWidth.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+                },
               ]}
             />
           </View>
         )}
 
-        <WebView
-          ref={webviewRef}
-          source={{ uri: 'https://growthnow.marketwhaleai.com/' }}
-          style={styles.webview}
-          onLoadStart={onLoadStart}
-          onLoadProgress={onLoadProgress}
-          onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
-          javaScriptEnabled
-          domStorageEnabled
-          injectedJavaScript={injectedJS}
-          onMessage={onMessage}
-          onNavigationStateChange={handleNavigationStateChange} // ✅ track history
-        />
+        <ScrollView
+          contentContainerStyle={styles.scrollViewContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#00FFDD"
+              colors={['#00FFDD']}
+              enabled={isAtTop} // Only enable refresh control when at the top
+            />
+          }
+          scrollEnabled={isAtTop} // Only enable ScrollView scrolling when at the top
+        >
+          <WebView
+            ref={webviewRef}
+            source={{ uri: 'https://shopnow.marketwhaleai.com/' }}
+            style={styles.webview}
+            onLoadStart={onLoadStart}
+            onLoadProgress={onLoadProgress}
+            onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
+            javaScriptEnabled
+            domStorageEnabled
+            injectedJavaScript={injectedJS}
+            onMessage={onMessage}
+            onNavigationStateChange={handleNavigationStateChange}
+            onScroll={handleScroll} // Add onScroll handler
+            bounces={false} // Disable bounces on WebView
+            overScrollMode="never" // Disable overscroll on WebView
+            pullToRefreshEnabled={false} // Disable pull-to-refresh on WebView
+            scrollEnabled={false} // Disable WebView's internal scrolling
+            onLoadEnd={() => setRefreshing(false)}
+          />
+        </ScrollView>
       </SafeAreaView>
     </ThemedView>
   );
@@ -132,4 +166,5 @@ const styles = StyleSheet.create({
   progressContainer: { height: 4, backgroundColor: '#222', overflow: 'hidden' },
   progressBar: { height: '100%', backgroundColor: '#00FFDD' },
   webview: { flex: 1 },
+  scrollViewContent: { flexGrow: 1 }, // Ensure ScrollView content takes full height
 });
