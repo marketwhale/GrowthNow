@@ -68,8 +68,10 @@ export default function WebViewScreen() {
 
   const injectedJS = `
     (function() {
-      document.documentElement.style.overflow = 'scroll';
-      document.body.style.overflow = 'scroll';
+      document.documentElement.style.overflowY = 'scroll';
+      document.documentElement.style.overflowX = 'hidden';
+      document.body.style.overflowY = 'scroll';
+      document.body.style.overflowX = 'hidden';
       window.open = function(url) { window.location.href = url; return null; };
       document.addEventListener('click', function(e) {
         var a = e.target.closest('a');
