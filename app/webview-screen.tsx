@@ -57,7 +57,7 @@ export default function WebViewScreen() {
 
   const handleShouldStartLoadWithRequest = (request: any) => {
     const { url } = request;
-    if (url.startsWith('https://shopnow.marketwhaleai.com/')) return true;
+    if (url.startsWith('https://vistara.live/')) return true;
     if (url.startsWith('tel:') || url.startsWith('mailto:') || url.startsWith('https://wa.me')) {
       Linking.openURL(url).catch(console.error);
       return false;
@@ -76,7 +76,7 @@ export default function WebViewScreen() {
         if (a && a.target === '_blank') {
           e.preventDefault();
           var href = a.href;
-          if (href.startsWith('https://shopnow.marketwhaleai.com/')) {
+          if (href.startsWith('https://vistara.live/')) {
             window.location.href = href;
           } else {
             window.ReactNativeWebView.postMessage(JSON.stringify({ url: href }));
@@ -144,7 +144,7 @@ export default function WebViewScreen() {
         >
           <WebView
             ref={webviewRef}
-            source={{ uri: 'https://shopnow.marketwhaleai.com/' }}
+            source={{ uri: 'https://vistara.live/' }}
             style={styles.webview}
             onLoadStart={onLoadStart}
             onLoadProgress={onLoadProgress}
