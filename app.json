@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "GrowthNow",
-    "slug": "growthnow",
+    "name": "VistaraLive",
+    "slug": "vistaralive",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "growthnow",
+    "icon": "./assets/images/vistara.png",
+    "scheme": "vistaralive",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.marketwhaleit.growthnow",
+      "bundleIdentifier": "com.marketwhaleit.vistaralive",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -18,13 +18,13 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "foregroundImage": "./assets/images/vistara.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "monochromeImage": "./assets/images/vistara.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.marketwhaleit.growthnow"
+      "package": "com.marketwhaleit.vistaralive"
     },
     "web": {
       "output": "static",
@@ -55,6 +55,6 @@
         "projectId": "8eb67800-8203-46f9-8107-9b9631908853"
       }
     },
-    "owner": "marketwhaleit"
+    "owner": "vistaralive"
   }
 }
